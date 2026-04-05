@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Semester {{ semester_num }} Subjects — Academic Hub{% endblock %}
+{% block page_title %}Semester {{ semester_num }}{% endblock %}
+
+{% block content %}
+<div class="subjects-page">
+    <div class="page-header">
+        <div>
+            <a href="{% url 'semesters' %}" class="back-link">← Back to Semesters</a>
+            <h2>Semester {{ semester_num }} Subjects</h2>
+        </div>
+    </div>
+
+    {% if subjects %}
+    <div class="subjects-grid">
+        {% for subject in subjects %}
+        <div class="subject-card">
+            <div class="subject-card-top">
+                <div class="subject-badge">{{ subject.code }}</div>
+                <div class="subject-sem-badge">Sem {{ subject.semester }}</div>
+            </div>
+            <h3 class="subject-name">{{ subject.name }}</h3>
+            <div class="subject-teacher">
+                <span class="teacher-icon">👨‍🏫</span>
+                <span>{{ subject.teacher.name|default:"TBA" }}</span>
+            </div>
+            <a href="{% url 'subject_files' subject.id %}" class="btn-secondary btn-full">
+                View Files →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <h3>No subjects in Semester {{ semester_num }}</h3>
+        <p>Subjects will appear here once teachers add them.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

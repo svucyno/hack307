@@ -1,0 +1,119 @@
+{% extends 'core/base.html' %}
+{% load core_filters %}
+
+{% block title %}Timetable — Academic Hub{% endblock %}
+{% block page_title %}Timetable{% endblock %}
+
+{% block content %}
+<div class="timetable-page">
+    <div class="page-header">
+        <h2>📅 Class Timetable</h2>
+        <p>Weekly schedule for all classes and lectures.</p>
+    </div>
+
+    {% if user.role == 'teacher' %}
+    <div class="card add-timetable-card">
+        <div class="card-header collapsible" onclick="toggleCollapse('timetableForm')">
+            <h3>➕ Add Timetable Entry</h3>
+            <span class="collapse-icon" id="timetableFormIcon">▼</span>
+        </div>
+        <div class="collapse-body" id="timetableForm">
+            <form method="post" action="{% url 'timetable' %}" class="timetable-form">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Day *</label>
+                        <select name="day" required>
+                            <option value="">-- Day --</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject *</label>
+                        <select name="subject" required>
+                            <option value="">-- Subject --</option>
+                            {% for subject in all_subjects %}
+                            <option value="{{ subject.id }}">{{ subject.code }} — {{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time *</label>
+                        <input type="time" name="start_time" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time *</label>
+                        <input type="time" name="end_time" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Room *</label>
+                        <input type="text" name="room" placeholder="e.g. Room 101" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Add Entry</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="timetable-container">
+        {% if not has_entries %}
+        <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <h3>No timetable entries yet</h3>
+            {% if user.role == 'teacher' %}
+            <p>Add your first entry using the form above.</p>
+            {% else %}
+            <p>Timetable entries will appear here once teachers add them.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% for day in days %}
+        {% with entries=timetable_by_day|get_item:day %}
+        {% if entries %}
+        <div class="day-section">
+            <div class="day-header">
+                <h3>{{ day }}</h3>
+                <span class="day-count">{{ entries|length }} class{% if entries|length != 1 %}es{% endif %}</span>
+            </div>
+            <div class="timetable-entries">
+                {% for entry in entries %}
+                <div class="timetable-card">
+                    <div class="time-col">
+                        <span class="time-start">{{ entry.start_time|time:"g:i A" }}</span>
+                        <span class="time-sep">to</span>
+                        <span class="time-end">{{ entry.end_time|time:"g:i A" }}</span>
+                    </div>
+                    <div class="entry-details">
+                        <h4>{{ entry.subject.name }}</h4>
+                        <div class="entry-meta">
+                            <span>📍 {{ entry.room }}</span>
+                            <span>🏷 {{ entry.subject.code }}</span>
+                            {% if entry.subject.teacher %}
+                            <span>👨‍🏫 {{ entry.subject.teacher.name }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if user.role == 'teacher' %}
+                    <form method="post" action="{% url 'delete_timetable' entry.id %}"
+                          onsubmit="return confirm('Remove this entry?')">
+                        {% csrf_token %}
+                        <button type="submit" class="icon-btn delete-btn" title="Delete">🗑</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
