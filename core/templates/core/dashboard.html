@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard — Academic Hub{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="welcome-banner">
+        <div class="welcome-text">
+            <h1>Welcome back, {{ user.name }}! 👋</h1>
+            <p>Here's what's happening in your academic world today.</p>
+        </div>
+        <div class="welcome-illustration">🎓</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-blue">
+            <div class="stat-icon">📚</div>
+            <div class="stat-info">
+                <span class="stat-number">8</span>
+                <span class="stat-label">Semesters</span>
+            </div>
+        </div>
+        <div class="stat-card stat-green">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+                <span class="stat-number">{{ total_subjects }}</span>
+                <span class="stat-label">Subjects</span>
+            </div>
+        </div>
+        <div class="stat-card stat-orange">
+            <div class="stat-icon">📁</div>
+            <div class="stat-info">
+                <span class="stat-number">{{ total_files }}</span>
+                <span class="stat-label">Files Available</span>
+            </div>
+        </div>
+        <div class="stat-card stat-purple">
+            <div class="stat-icon">🔔</div>
+            <div class="stat-info">
+                <span class="stat-number">{{ unread_notifs }}</span>
+                <span class="stat-label">Notifications</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card-header">
+                <h3>📋 Semesters</h3>
+                <a href="{% url 'semesters' %}" class="btn-link">View All →</a>
+            </div>
+            <div class="semester-quick-grid">
+                {% for i in semesters %}
+                <a href="{% url 'semester_detail' i %}" class="sem-quick-card">
+                    <span class="sem-num">{{ i }}</span>
+                    <span class="sem-label">Semester</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>📁 Recent Files</h3>
+                <a href="{% url 'semesters' %}" class="btn-link">Browse All →</a>
+            </div>
+            {% if recent_files %}
+            <div class="file-list">
+                {% for file in recent_files %}
+                <div class="file-item">
+                    <div class="file-icon">{{ file.get_file_icon }}</div>
+                    <div class="file-info">
+                        <span class="file-name">{{ file.title }}</span>
+                        <span class="file-meta">{{ file.subject.name }} · {{ file.uploaded_at|date:"M d" }}</span>
+                    </div>
+                    <a href="{{ file.file.url }}" download class="file-download">⬇</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📂</div>
+                <p>No files uploaded yet.</p>
+                <small>Files will appear here once teachers upload them.</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-grid">
+            <a href="{% url 'semesters' %}" class="action-card">
+                <span class="action-icon">📋</span>
+                <span>Browse Semesters</span>
+            </a>
+            <a href="{% url 'timetable' %}" class="action-card">
+                <span class="action-icon">📅</span>
+                <span>View Timetable</span>
+            </a>
+            <a href="{% url 'notifications' %}" class="action-card">
+                <span class="action-icon">🔔</span>
+                <span>Notifications {% if unread_notifs %}<span class="badge">{{ unread_notifs }}</span>{% endif %}</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

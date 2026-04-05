@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart College Academic Hub{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">📚</div>
+                <div class="brand-text">
+                    <span class="brand-name">AcademicHub</span>
+                    <span class="brand-sub">Smart College Portal</span>
+                </div>
+            </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar">{{ user.name|first|upper }}</div>
+                <div class="user-info">
+                    <span class="user-name">{{ user.name }}</span>
+                    <span class="user-role role-badge role-{{ user.role }}">{{ user.role|capfirst }}</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                {% if user.role == 'student' %}
+                <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <span class="nav-icon">🏠</span><span>Dashboard</span>
+                </a>
+                <a href="{% url 'semesters' %}" class="nav-item {% if 'semester' in request.resolver_match.url_name %}active{% endif %}">
+                    <span class="nav-icon">📋</span><span>Semesters</span>
+                </a>
+                {% else %}
+                <a href="{% url 'upload' %}" class="nav-item {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
+                    <span class="nav-icon">⬆️</span><span>Upload Files</span>
+                </a>
+                <a href="{% url 'manage_subjects' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_subjects' %}active{% endif %}">
+                    <span class="nav-icon">📚</span><span>Subjects</span>
+                </a>
+                {% endif %}
+                <a href="{% url 'timetable' %}" class="nav-item {% if request.resolver_match.url_name == 'timetable' %}active{% endif %}">
+                    <span class="nav-icon">📅</span><span>Timetable</span>
+                </a>
+                <a href="{% url 'notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                    <span class="nav-icon">🔔</span><span>Notifications</span>
+                    <span class="notif-badge" id="notif-count" style="display:none"></span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+                <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+                <div class="topbar-actions">
+                    <a href="{% url 'notifications' %}" class="notif-btn">
+                        🔔 <span id="topbar-notif-count"></span>
+                    </a>
+                </div>
+            </div>
+
+            {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    {% else %}
+        {% block auth_content %}{% endblock %}
+    {% endif %}
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
