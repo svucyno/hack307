@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ subject.name }} Files — Academic Hub{% endblock %}
+{% block page_title %}{{ subject.name }}{% endblock %}
+
+{% block content %}
+<div class="subject-files-page">
+    <div class="page-header">
+        <div>
+            <a href="{% url 'semester_detail' subject.semester %}" class="back-link">← Semester {{ subject.semester }}</a>
+            <h2>{{ subject.name }}</h2>
+            <p>Code: <strong>{{ subject.code }}</strong> · Faculty: <strong>{{ subject.teacher.name|default:"TBA" }}</strong></p>
+        </div>
+    </div>
+
+    {% if files %}
+    <div class="files-grid">
+        {% for file in files %}
+        <div class="file-card">
+            <div class="file-card-icon">{{ file.get_file_icon }}</div>
+            <div class="file-card-info">
+                <h4>{{ file.title }}</h4>
+                {% if file.description %}
+                <p class="file-desc">{{ file.description }}</p>
+                {% endif %}
+                <div class="file-meta-row">
+                    <span>{{ file.uploaded_at|date:"M d, Y" }}</span>
+                    <span>by {{ file.uploaded_by.name }}</span>
+                </div>
+            </div>
+            <a href="{{ file.file.url }}" download class="btn-download">
+                ⬇ Download
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <h3>No files uploaded yet</h3>
+        <p>Files for {{ subject.name }} will appear here once the teacher uploads them.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
