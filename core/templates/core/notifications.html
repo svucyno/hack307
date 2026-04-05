@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Notifications — Academic Hub{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="notifications-page">
+    <div class="page-header">
+        <h2>🔔 Notifications</h2>
+        <p>{{ notifications|length }} total notification{% if notifications|length != 1 %}s{% endif %}</p>
+    </div>
+
+    {% if notifications %}
+    <div class="notifications-list">
+        {% for notif in notifications %}
+        <div class="notif-card notif-{{ notif.notif_type }} {% if not notif.is_read %}notif-unread{% endif %}">
+            <div class="notif-type-icon">
+                {% if notif.notif_type == 'upload' %}📁
+                {% elif notif.notif_type == 'assignment' %}📝
+                {% elif notif.notif_type == 'reminder' %}⏰
+                {% else %}📢
+                {% endif %}
+            </div>
+            <div class="notif-content">
+                <div class="notif-header-row">
+                    <h4 class="notif-title">{{ notif.title }}</h4>
+                    <span class="notif-time">{{ notif.created_at|timesince }} ago</span>
+                </div>
+                <p class="notif-message">{{ notif.message }}</p>
+                <div class="notif-tags">
+                    <span class="notif-type-tag tag-{{ notif.notif_type }}">
+                        {{ notif.get_notif_type_display }}
+                    </span>
+                    <span class="notif-date">{{ notif.created_at|date:"M d, Y · g:i A" }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🔕</div>
+        <h3>No notifications yet</h3>
+        <p>You'll receive notifications when teachers upload files, add assignments, or post reminders.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
