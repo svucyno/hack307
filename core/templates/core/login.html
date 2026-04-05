@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Login — Academic Hub{% endblock %}
+
+{% block auth_content %}
+<div class="auth-page">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <div class="auth-logo">📚</div>
+            <h1 class="auth-title">Smart College<br>Academic Hub</h1>
+            <p class="auth-tagline">Your complete academic management platform for all 8 semesters.</p>
+        </div>
+        <div class="auth-features">
+            <div class="feature-item"><span>📁</span> Access study materials anytime</div>
+            <div class="feature-item"><span>📅</span> View your class timetable</div>
+            <div class="feature-item"><span>🔔</span> Get instant notifications</div>
+            <div class="feature-item"><span>👨‍🏫</span> Connect with teachers</div>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account</p>
+            </div>
+
+            {% if messages %}
+            <div class="auth-messages">
+                {% for message in messages %}
+                <div class="alert alert-error">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" class="auth-form">
+                {% csrf_token %}
+
+                <div class="role-selector">
+                    <label class="role-option">
+                        <input type="radio" name="role" value="student" checked>
+                        <span class="role-btn">
+                            <span class="role-icon">🎓</span>
+                            Student
+                        </span>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="role" value="teacher">
+                        <span class="role-btn">
+                            <span class="role-icon">👨‍🏫</span>
+                            Teacher
+                        </span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-field">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">Sign In →</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

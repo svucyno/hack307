@@ -1,0 +1,100 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Manage Subjects — Academic Hub{% endblock %}
+{% block page_title %}Manage Subjects{% endblock %}
+
+{% block content %}
+<div class="manage-subjects-page">
+    <div class="page-header">
+        <h2>📚 Manage Subjects</h2>
+        <p>Add, view, and manage subjects across all 8 semesters.</p>
+    </div>
+
+    <div class="manage-layout">
+        <!-- Add Subject Form -->
+        <div class="card add-subject-card">
+            <div class="card-header">
+                <h3>➕ Add New Subject</h3>
+            </div>
+            <form method="post" action="{% url 'manage_subjects' %}" class="subject-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+
+                <div class="form-group">
+                    <label>Subject Name *</label>
+                    <input type="text" name="name" placeholder="e.g. Data Structures" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject Code *</label>
+                    <input type="text" name="code" placeholder="e.g. CS201" required>
+                </div>
+                <div class="form-group">
+                    <label>Semester *</label>
+                    <select name="semester" required>
+                        <option value="">-- Select Semester --</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assign Teacher <span class="optional">(optional)</span></label>
+                    <select name="teacher">
+                        <option value="">-- Select Teacher --</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Add Subject</button>
+            </form>
+        </div>
+
+        <!-- Subjects grouped by semester -->
+        <div class="subjects-list-panel">
+            {% if subjects %}
+                {% for sem_num in "12345678" %}
+                <div class="sem-group">
+                    <div class="sem-group-header">
+                        <h4>Semester {{ sem_num }}</h4>
+                    </div>
+                    <div class="sem-group-subjects">
+                        {% with found=False %}
+                        {% for subject in subjects %}
+                        {% if subject.semester|stringformat:"s" == sem_num %}
+                        <div class="subject-row">
+                            <div class="subject-row-info">
+                                <span class="subject-row-code">{{ subject.code }}</span>
+                                <span class="subject-row-name">{{ subject.name }}</span>
+                                <span class="subject-row-teacher">{{ subject.teacher.name|default:"No teacher assigned" }}</span>
+                            </div>
+                            <form method="post" action="{% url 'manage_subjects' %}"
+                                  onsubmit="return confirm('Delete subject {{ subject.name }}?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="subject_id" value="{{ subject.id }}">
+                                <button type="submit" class="icon-btn delete-btn" title="Delete">🗑</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endwith %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📚</div>
+                <h3>No subjects added yet</h3>
+                <p>Use the form to add your first subject.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
