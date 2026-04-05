@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Semesters — Academic Hub{% endblock %}
+{% block page_title %}Semesters{% endblock %}
+
+{% block content %}
+<div class="semesters-page">
+    <div class="page-header">
+        <h2>All Semesters</h2>
+        <p>Select a semester to view its subjects and study materials.</p>
+    </div>
+
+    <div class="semester-grid">
+        {% for sem in semester_data %}
+        <a href="{% url 'semester_detail' sem.number %}" class="semester-card">
+            <div class="sem-card-number">{{ sem.number }}</div>
+            <div class="sem-card-info">
+                <h3>Semester {{ sem.number }}</h3>
+                <p>{{ sem.subject_count }} subject{% if sem.subject_count != 1 %}s{% endif %}</p>
+            </div>
+            <div class="sem-card-subjects">
+                {% for subject in sem.subjects|slice:":3" %}
+                <span class="subject-chip">{{ subject.code }}</span>
+                {% endfor %}
+                {% if sem.subject_count > 3 %}
+                <span class="subject-chip more">+{{ sem.subject_count|add:"-3" }} more</span>
+                {% endif %}
+            </div>
+            <div class="sem-card-arrow">→</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
