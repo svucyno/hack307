@@ -25,4 +25,8 @@ urlpatterns = [
 
     # API
     path('api/notifications/count/', views.api_unread_count, name='api_unread_count'),
+    # Syllabus
+    path('syllabus/', views.syllabus_view, name='syllabus'),
+    path('syllabus/<int:subject_id>/', views.syllabus_detail, name='syllabus_detail'),
+    path('syllabus/manage/', views.manage_syllabus, name='manage_syllabus'),
 ]

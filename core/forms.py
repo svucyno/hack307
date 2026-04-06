@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import User, Subject, UploadedFile, Timetable, Notification
+from .models import User, Subject, UploadedFile, Timetable, Notification, Syllabus
 import os
 
 
@@ -74,3 +74,13 @@ class NotificationForm(forms.ModelForm):
     class Meta:
         model = Notification
         fields = ['title', 'message', 'notif_type', 'recipient']
+class SyllabusForm(forms.ModelForm):
+    class Meta:
+        model = Syllabus
+        fields = ['subject', 'unit_number', 'unit_title', 'topics', 'description']
+        widgets = {
+            'unit_number':  forms.NumberInput(attrs={'min': 1, 'max': 10, 'placeholder': 'e.g. 1'}),
+            'unit_title':   forms.TextInput(attrs={'placeholder': 'e.g. Introduction to Python'}),
+            'topics':       forms.Textarea(attrs={'rows': 6, 'placeholder': 'Enter each topic on a new line:\nVariables and Data Types\nControl Flow\nFunctions'}),
+            'description':  forms.Textarea(attrs={'rows': 3, 'placeholder': 'Brief description of this unit...'}),
+        }

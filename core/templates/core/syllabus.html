@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Syllabus — Academic Hub{% endblock %}
+{% block page_title %}Syllabus{% endblock %}
+
+{% block content %}
+<div class="syllabus-page">
+    <div class="page-header">
+        <h2>📜 Semester Syllabus</h2>
+        <p>Complete syllabus for all 8 semesters unit by unit.</p>
+    </div>
+
+    <div class="syllabus-accordion">
+        {% for sem in semester_data %}
+        <div class="sem-accordion-item">
+            <div class="sem-accordion-header" onclick="toggleSem({{ sem.number }})">
+                <div class="sem-acc-left">
+                    <span class="sem-acc-num">{{ sem.number }}</span>
+                    <div>
+                        <h3>Semester {{ sem.number }}</h3>
+                        <p>{{ sem.subjects|length }} subject{% if sem.subjects|length != 1 %}s{% endif %}</p>
+                    </div>
+                </div>
+                <span class="sem-acc-arrow" id="arrow-{{ sem.number }}">▼</span>
+            </div>
+            <div class="sem-accordion-body" id="sem-body-{{ sem.number }}">
+                {% if sem.subjects %}
+                <div class="syllabus-subjects-grid">
+                    {% for subject in sem.subjects %}
+                    <div class="syllabus-subject-card">
+                        <div class="syl-subject-header">
+                            <div>
+                                <span class="subject-badge">{{ subject.code }}</span>
+                                <h4>{{ subject.name }}</h4>
+                                <span class="subject-teacher">👨‍🏫 {{ subject.teacher.name|default:"TBA" }}</span>
+                            </div>
+                            <a href="{% url 'syllabus_detail' subject.id %}" class="btn-secondary">
+                                View Syllabus →
+                            </a>
+                        </div>
+                        <div class="syl-units-preview">
+                            {% for unit in subject.syllabus_units.all %}
+                            <div class="syl-unit-chip">
+                                <span class="unit-num">Unit {{ unit.unit_number }}</span>
+                                <span class="unit-title">{{ unit.unit_title }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="no-syllabus">No syllabus added yet</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state small">
+                    <p>No subjects in Semester {{ sem.number }} yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function toggleSem(num) {
+    const body  = document.getElementById('sem-body-' + num);
+    const arrow = document.getElementById('arrow-' + num);
+    body.classList.toggle('open');
+    arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+// Open semester 1 by default
+document.addEventListener('DOMContentLoaded', () => toggleSem(1));
+</script>
+{% endblock %}

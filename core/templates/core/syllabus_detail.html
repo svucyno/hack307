@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ subject.name }} Syllabus{% endblock %}
+{% block page_title %}Syllabus Detail{% endblock %}
+
+{% block content %}
+<div class="syllabus-detail-page">
+    <div class="page-header">
+        <a href="{% url 'syllabus' %}" class="back-link">← Back to Syllabus</a>
+        <h2>{{ subject.name }}</h2>
+        <p>
+            <span class="subject-badge">{{ subject.code }}</span>
+            Semester {{ subject.semester }} ·
+            👨‍🏫 {{ subject.teacher.name|default:"TBA" }}
+        </p>
+    </div>
+
+    {% if units %}
+    <div class="units-list">
+        {% for unit in units %}
+        <div class="unit-card">
+            <div class="unit-card-header">
+                <div class="unit-number-badge">Unit {{ unit.unit_number }}</div>
+                <h3 class="unit-title">{{ unit.unit_title }}</h3>
+            </div>
+            {% if unit.description %}
+            <p class="unit-description">{{ unit.description }}</p>
+            {% endif %}
+            <div class="unit-topics">
+                <h4>📌 Topics Covered</h4>
+                <ul class="topics-list">
+                    {% for topic in unit.get_topics_list %}
+                    <li>{{ topic }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📜</div>
+        <h3>No syllabus added yet</h3>
+        {% if user.role == 'teacher' %}
+        <p>Go to <a href="{% url 'manage_syllabus' %}">Manage Syllabus</a> to add units.</p>
+        {% else %}
+        <p>The teacher hasn't added the syllabus yet.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

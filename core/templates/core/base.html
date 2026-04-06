@@ -29,31 +29,36 @@
                     <span class="user-role role-badge role-{{ user.role }}">{{ user.role|capfirst }}</span>
                 </div>
             </div>
-
-            <nav class="sidebar-nav">
-                {% if user.role == 'student' %}
-                <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                    <span class="nav-icon">🏠</span><span>Dashboard</span>
-                </a>
-                <a href="{% url 'semesters' %}" class="nav-item {% if 'semester' in request.resolver_match.url_name %}active{% endif %}">
-                    <span class="nav-icon">📋</span><span>Semesters</span>
-                </a>
-                {% else %}
-                <a href="{% url 'upload' %}" class="nav-item {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
-                    <span class="nav-icon">⬆️</span><span>Upload Files</span>
-                </a>
-                <a href="{% url 'manage_subjects' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_subjects' %}active{% endif %}">
-                    <span class="nav-icon">📚</span><span>Subjects</span>
-                </a>
-                {% endif %}
-                <a href="{% url 'timetable' %}" class="nav-item {% if request.resolver_match.url_name == 'timetable' %}active{% endif %}">
-                    <span class="nav-icon">📅</span><span>Timetable</span>
-                </a>
-                <a href="{% url 'notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
-                    <span class="nav-icon">🔔</span><span>Notifications</span>
-                    <span class="notif-badge" id="notif-count" style="display:none"></span>
-                </a>
-            </nav>
+<nav class="sidebar-nav">
+    {% if user.role == 'student' %}
+    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <span class="nav-icon">🏠</span><span>Dashboard</span>
+    </a>
+    <a href="{% url 'semesters' %}" class="nav-item {% if 'semester' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="nav-icon">📋</span><span>Semesters</span>
+    </a>
+    <a href="{% url 'syllabus' %}" class="nav-item {% if 'syllabus' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="nav-icon">📜</span><span>Syllabus</span>
+    </a>
+    {% else %}
+    <a href="{% url 'upload' %}" class="nav-item {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
+        <span class="nav-icon">⬆️</span><span>Upload Files</span>
+    </a>
+    <a href="{% url 'manage_subjects' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_subjects' %}active{% endif %}">
+        <span class="nav-icon">📚</span><span>Subjects</span>
+    </a>
+    <a href="{% url 'manage_syllabus' %}" class="nav-item {% if 'syllabus' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="nav-icon">📜</span><span>Syllabus</span>
+    </a>
+    {% endif %}
+    <a href="{% url 'timetable' %}" class="nav-item {% if request.resolver_match.url_name == 'timetable' %}active{% endif %}">
+        <span class="nav-icon">📅</span><span>Timetable</span>
+    </a>
+    <a href="{% url 'notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+        <span class="nav-icon">🔔</span><span>Notifications</span>
+        <span class="notif-badge" id="notif-count" style="display:none"></span>
+    </a>
+</nav>
 
             <div class="sidebar-footer">
                 <a href="{% url 'logout' %}" class="logout-btn">

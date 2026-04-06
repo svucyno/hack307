@@ -126,3 +126,21 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
+class Syllabus(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='syllabus_units')
+    unit_number = models.IntegerField()
+    unit_title = models.CharField(max_length=200)
+    topics = models.TextField(help_text="Enter topics separated by new lines")
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['unit_number']
+        unique_together = ['subject', 'unit_number']
+
+    def __str__(self):
+        return f"{self.subject.code} — Unit {self.unit_number}: {self.unit_title}"
+
+    def get_topics_list(self):
+        return [t.strip() for t in self.topics.split('\n') if t.strip()]
