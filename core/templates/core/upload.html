@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Upload Files — Academic Hub{% endblock %}
+{% block page_title %}Upload Files{% endblock %}
+
+{% block content %}
+<div class="upload-page">
+    <div class="page-header">
+        <h2>📤 Upload Study Material</h2>
+        <p>Share files with students across all semesters.</p>
+    </div>
+
+    <div class="upload-layout">
+        <!-- Upload Form -->
+        <div class="card upload-form-card">
+            <div class="card-header">
+                <h3>New Upload</h3>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_title">File Title *</label>
+                    <input type="text" id="id_title" name="title" placeholder="e.g. Chapter 3 Notes" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_subject">Subject *</label>
+                    <select id="id_subject" name="subject" required>
+                        <option value="">-- Select a Subject --</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}">Sem {{ subject.semester }} · {{ subject.code }} — {{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not subjects %}
+                    <small class="form-hint warning">⚠ No subjects found. <a href="{% url 'manage_subjects' %}">Add subjects first.</a></small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_file">File *</label>
+                    <div class="file-drop-zone" id="fileDropZone">
+                        <input type="file" id="id_file" name="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.gif" required>
+                        <div class="drop-content" id="dropContent">
+                            <span class="drop-icon">📁</span>
+                            <p>Drag & drop or <label for="id_file" class="file-browse-link">browse</label></p>
+                            <small>PDF, PPT, DOC, DOCX, Images · Max 10MB</small>
+                        </div>
+                        <div class="drop-preview" id="dropPreview" style="display:none">
+                            <span id="previewIcon">📄</span>
+                            <span id="previewName"></span>
+                            <span id="previewSize"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_description">Description <span class="optional">(optional)</span></label>
+                    <textarea id="id_description" name="description" rows="3" placeholder="Brief description of the file content..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary btn-full" id="submitBtn">
+                        <span class="btn-text">Upload File</span>
+                        <span class="btn-loading" style="display:none">Uploading…</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- My Uploads -->
+        <div class="card my-uploads-card">
+            <div class="card-header">
+                <h3>My Recent Uploads</h3>
+                <span class="count-badge">{{ my_uploads|length }}</span>
+            </div>
+
+            {% if my_uploads %}
+            <div class="upload-list">
+                {% for file in my_uploads %}
+                <div class="upload-item">
+                    <div class="upload-item-icon">{{ file.get_file_icon }}</div>
+                    <div class="upload-item-info">
+                        <span class="upload-item-name">{{ file.title }}</span>
+                        <span class="upload-item-meta">{{ file.subject.code }} · {{ file.uploaded_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="upload-item-actions">
+                        <a href="{{ file.file.url }}" target="_blank" class="icon-btn view-btn" title="View">👁</a>
+                        <form method="post" action="{% url 'delete_file' file.id %}" class="inline-form"
+                              onsubmit="return confirm('Delete this file?')">
+                            {% csrf_token %}
+                            <button type="submit" class="icon-btn delete-btn" title="Delete">🗑</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state small">
+                <div class="empty-icon">📭</div>
+                <p>No uploads yet.</p>
+            </div>
+            {% endif %}
+
+            <div class="card-footer">
+                <a href="{% url 'manage_subjects' %}" class="btn-secondary">+ Manage Subjects</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

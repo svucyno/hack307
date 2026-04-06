@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import User, Subject, UploadedFile, Timetable, Notification
-from .forms import RegisterForm, SubjectForm, FileUploadForm, TimetableForm
+from .models import User, Subject, UploadedFile, Timetable, Notification, Syllabus
+from .forms import RegisterForm, SubjectForm, FileUploadForm, TimetableForm, SyllabusForm
 
 
 # ──────────────────────────────────────────────
@@ -304,3 +304,61 @@ def manage_subjects(request):
 def api_unread_count(request):
     count = Notification.objects.filter(recipient=request.user, is_read=False).count()
     return JsonResponse({'count': count})
+# ──────────────────────────────────────────────
+# SYLLABUS
+# ──────────────────────────────────────────────
+@login_required
+def syllabus_view(request):
+    semester_data = []
+    for i in range(1, 9):
+        subjects = Subject.objects.filter(semester=i).prefetch_related('syllabus_units')
+        semester_data.append({
+            'number':   i,
+            'subjects': subjects,
+        })
+    return render(request, 'core/syllabus.html', {'semester_data': semester_data})
+
+
+@login_required
+def syllabus_detail(request, subject_id):
+    subject = get_object_or_404(Subject, id=subject_id)
+    units   = Syllabus.objects.filter(subject=subject).order_by('unit_number')
+    return render(request, 'core/syllabus_detail.html', {
+        'subject': subject,
+        'units':   units,
+    })
+
+
+@login_required
+def manage_syllabus(request):
+    if request.user.role != 'teacher':
+        return redirect('syllabus')
+
+    subjects = Subject.objects.all().order_by('semester', 'name')
+    units    = Syllabus.objects.select_related('subject').order_by('subject__semester', 'unit_number')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'add':
+            form = SyllabusForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Syllabus unit added successfully!')
+                return redirect('manage_syllabus')
+            else:
+                for errors in form.errors.values():
+                    for error in errors:
+                        messages.error(request, error)
+
+        elif action == 'delete':
+            unit = get_object_or_404(Syllabus, id=request.POST.get('unit_id'))
+            unit.delete()
+            messages.success(request, 'Unit deleted.')
+            return redirect('manage_syllabus')
+
+    return render(request, 'core/manage_syllabus.html', {
+        'subjects': subjects,
+        'units':    units,
+        'form':     SyllabusForm(),
+    })

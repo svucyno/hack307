@@ -1,0 +1,94 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Manage Syllabus — Academic Hub{% endblock %}
+{% block page_title %}Manage Syllabus{% endblock %}
+
+{% block content %}
+<div class="manage-syllabus-page">
+    <div class="page-header">
+        <h2>📜 Manage Syllabus</h2>
+        <p>Add unit-wise syllabus for all subjects across 8 semesters.</p>
+    </div>
+
+    <div class="manage-layout">
+        <!-- Add Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3>➕ Add Syllabus Unit</h3>
+            </div>
+            <form method="post" action="{% url 'manage_syllabus' %}" class="subject-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select name="subject" required>
+                        <option value="">-- Select Subject --</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}">Sem {{ subject.semester }} — {{ subject.code }} {{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unit Number *</label>
+                    <input type="number" name="unit_number" min="1" max="10" placeholder="e.g. 1" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit Title *</label>
+                    <input type="text" name="unit_title" placeholder="e.g. Introduction to Data Structures" required>
+                </div>
+                <div class="form-group">
+                    <label>Topics * <span class="optional">(one per line)</span></label>
+                    <textarea name="topics" rows="6" placeholder="Arrays and Linked Lists&#10;Stacks and Queues&#10;Trees and Graphs&#10;Sorting Algorithms" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Description <span class="optional">(optional)</span></label>
+                    <textarea name="description" rows="2" placeholder="Brief overview of this unit..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Add Unit</button>
+            </form>
+        </div>
+
+        <!-- Existing Units -->
+        <div class="syllabus-units-panel">
+            {% if units %}
+            {% regroup units by subject.semester as semester_units %}
+            {% for semester in semester_units %}
+            <div class="sem-group">
+                <div class="sem-group-header">
+                    <h4>Semester {{ semester.grouper }}</h4>
+                    <span class="count-badge">{{ semester.list|length }} unit{% if semester.list|length != 1 %}s{% endif %}</span>
+                </div>
+                <div class="sem-group-subjects">
+                    {% for unit in semester.list %}
+                    <div class="subject-row">
+                        <div class="subject-row-info">
+                            <span class="subject-row-code">Unit {{ unit.unit_number }}</span>
+                            <div>
+                                <span class="subject-row-name">{{ unit.unit_title }}</span>
+                                <span class="subject-row-teacher">{{ unit.subject.code }} — {{ unit.subject.name }}</span>
+                            </div>
+                        </div>
+                        <form method="post" action="{% url 'manage_syllabus' %}"
+                              onsubmit="return confirm('Delete this unit?')">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="unit_id" value="{{ unit.id }}">
+                            <button type="submit" class="icon-btn delete-btn">🗑</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📜</div>
+                <h3>No syllabus units yet</h3>
+                <p>Use the form to add your first syllabus unit.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

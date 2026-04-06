@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Subject, UploadedFile, Timetable, Notification
+from .models import User, Subject, UploadedFile, Timetable, Notification, Syllabus
 
 
 @admin.register(User)
@@ -29,3 +29,7 @@ class TimetableAdmin(admin.ModelAdmin):
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'notif_type', 'recipient', 'is_read', 'created_at']
+@admin.register(Syllabus)
+class SyllabusAdmin(admin.ModelAdmin):
+    list_display = ['subject', 'unit_number', 'unit_title']
+    list_filter = ['subject__semester']
